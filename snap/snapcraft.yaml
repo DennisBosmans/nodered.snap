@@ -1,10 +1,10 @@
 name: noderednatscli
-adopt-info: noderednatscli
+version: '0.1'
 
 summary: Low-code programming for event-driven applications
 description: Node-RED is a flow based programming application for wiring together hardware devices, APIs and online services in new and interesting ways. For more information see http://nodered.org
 confinement: strict
-grade: stable
+grade: devel
 base: core22
 
 # Limit architectures as ppcel64 doesn't build currently
@@ -40,6 +40,8 @@ apps:
     command: bin/desktop-launch
     plugs:
       - desktop
+  nats-cli:
+    command: bin/nats
 
 parts:
   node: # We dump in a specific version of node/npm from upstream.
@@ -84,9 +86,7 @@ parts:
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitattributes -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitignore -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname "*~" -exec rm -f {} \;
-      VER=$(npm show node-red version)
-      echo "VERSION $(npm show node-red version)"
-      # craftctl set version= "1.0.0"
+
 
       
   settings:
