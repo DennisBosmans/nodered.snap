@@ -1,71 +1,33 @@
 name: noderednatscli
-adopt-info: noderednatscli
-summary: Low-code programming for event-driven applications
-description: >
-  Node-RED is a flow-based programming application for wiring together hardware devices,
-  APIs, and online services in new and interesting ways. For more information see http://nodered.org
-confinement: strict
-grade: stable
-base: core22
+version: '0.1'
+summary: Node-RED with Node.js and nats-cli
+description: |
+  A snap for running Node-RED with the latest version of Node.js and nats-cli installed via npm, optimized for ARM64 architecture.
 
-# Specify architectures
+grade: stable
+confinement: strict
 architectures:
-  - build-on: armhf
   - build-on: arm64
+    run-on: arm64
 
 apps:
   node-red:
-    command: bin/startNR
-    daemon: simple
-    restart-condition: on-failure
-    plugs:
-      - audio-playback
-      - bluez
-      - bluetooth-control
-      - camera
-      - gpio
-      - home
-      - network-bind
-      - network
-      - network-observe
-      - pulseaudio
-      - removable-media
-      - serial-port
-  npm:
-    command: bin/npm
-    plugs:
-      - home
-      - network
-  desktop-launch:
-    command: bin/desktop-launch
-    plugs:
-      - desktop
+    command: node $SNAP/node_modules/node-red/red.js
+    plugs: [network, network-bind]
 
 parts:
-  node: # Use an example source; adjust manually for your target architecture
-    plugin: dump
-    source: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz  # Example for arm64
-
-  node-red:
-    after: [node]
-    plugin: nil # Use the nil plugin for custom build steps
-    source: .
-    stage-packages:
+  nodejs:
+    plugin: nodejs
+    nodejs-version: "16.x"
+    nodejs-package-manager: "npm"
+    source: https://github.com/node-red/node-red.git
+    source-type: git
+    build-packages:
+      - build-essential
       - python3
-      - libatomic1
-  override-build: |
-      PATH=$PATH:../node/bin
-      apt-get update && apt-get install -y libatomic1
-      #   Apply `--unsafe-perm=true` directly to npm install commands
-      npm install --unsafe-perm=true --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport nats-cli
-      VER=$(npm show node-red version)
-      echo "Node-RED version: $VER"
-      craftctl set version=$VER
-
-
-  settings:
-    plugin: dump
-    source: snap/local/settings
-    organize:
-      start.sh: bin/startNR
-      desktop-launch: bin/desktop-launch
+    override-build: |
+      snapcraftctl build
+      npm install --unsafe-perm --arch=arm64 --target_arch=arm64
+      npm install nats-cli
+    stage-packages:
+      - libc6
