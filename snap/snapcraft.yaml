@@ -11,7 +11,7 @@ architectures:
 
 apps:
   node-red:
-    command: node $SNAP/node_modules/node-red/red.js
+    command: $SNAP/usr/bin/node $SNAP/node_modules/node-red/red.js
     environment:
       PATH: $SNAP/usr/bin:$PATH
     plugs: [network, network-bind]
@@ -23,10 +23,10 @@ parts:
     override-build: |
       # Download and install Node.js (Replace 'v14.17.0' with the version you prefer)
       wget https://nodejs.org/dist/v14.17.0/node-v14.17.0-linux-arm64.tar.xz
-      tar -xJf node-v14.17.0-linux-arm64.tar.xz -C $SNAPCRAFT_PART_INSTALL --strip-components=1
+      tar -xJf node-v14.17.0-linux-arm64.tar.xz -C $SNAPCRAFT_PART_INSTALL/usr --strip-components=1
       
       # Set PATH to use local node and npm binaries
-      export PATH=$SNAPCRAFT_PART_INSTALL/bin:$PATH
+      export PATH=$SNAPCRAFT_PART_INSTALL/usr/bin:$PATH
       
       # Verify Node.js and npm installations
       node -v
@@ -40,5 +40,3 @@ parts:
     build-packages:
       - wget
       - xz-utils
-    stage-packages:
-      - libc6
