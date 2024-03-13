@@ -1,9 +1,9 @@
 name: noderednatscli
+base: core20 # Use 'core20' as the base to ensure compatibility with ARM64 and recent package versions.
 version: '0.1'
-summary: Node-RED with Node.js and nats-cli
+summary: Node-RED with the latest Node.js and nats-cli
 description: |
-  A snap for running Node-RED with the latest version of Node.js and nats-cli installed via npm, optimized for ARM64 architecture.
-
+  This snap includes Node-RED, the latest version of Node.js, and nats-cli, optimized for ARM64 architecture.
 grade: stable
 confinement: strict
 architectures:
@@ -17,17 +17,26 @@ apps:
 
 parts:
   nodejs:
-    plugin: nodejs
-    nodejs-version: "16.x"
-    nodejs-package-manager: "npm"
-    source: https://github.com/node-red/node-red.git
-    source-type: git
-    build-packages:
-      - build-essential
-      - python3
+    plugin: nil
+    source: .
     override-build: |
-      snapcraftctl build
-      npm install --unsafe-perm --arch=arm64 --target_arch=arm64
+      # Download and install the latest Node.js for ARM64
+      wget https://nodejs.org/dist/latest/node-${NODE_VERSION}-linux-arm64.tar.xz
+      tar -xJf node-${NODE_VERSION}-linux-arm64.tar.xz -C $SNAPCRAFT_PART_INSTALL --strip-components=1
+      export PATH=$SNAPCRAFT_PART_INSTALL/bin:$PATH
+      
+      # Verify Node.js and npm installations
+      node -v
+      npm -v
+      
+      # Install Node-RED
+      npm install node-red
+      
+      # Install nats-cli
       npm install nats-cli
+    build-packages:
+      - wget
+      - xz-utils
     stage-packages:
       - libc6
+
