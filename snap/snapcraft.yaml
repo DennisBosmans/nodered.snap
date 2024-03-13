@@ -45,8 +45,8 @@ parts:
   node: # Dump in a specific version of node/npm from upstream
     plugin: dump
     source:
-      on armhf: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-armv7l.tar.gz
-      on arm64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz
+      on armhf: "https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-armv7l.tar.gz"
+      on arm64: "https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz"
 
   node-red:
     after: [node]
