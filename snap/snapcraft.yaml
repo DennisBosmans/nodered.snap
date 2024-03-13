@@ -1,40 +1,63 @@
-name: noderednatscli
 
-base: core22
-version: '0.1'
-summary: Node-RED and NATS CLI snap
-description: |
-  This snap includes Node-RED, a programming tool for wiring together hardware devices, APIs, and online services, as well as NATS CLI, a Node.js command-line utility for interacting with NATS messaging system.
-
-confinement: strict
-architectures:
-  - build-on: arm64
+    plugs:
+      - home
+      - network
+  desktop-launch:
+    command: bin/desktop-launch
+    plugs:
+      - desktop
 
 parts:
-  node-red-nats:
-    plugin: npm
-    source: https://github.com/node-red/node-red.git
-    npm-node-version: 16.x
-    build-packages:
-      - build-essential
-      - python3
-    override-build: |
-      snapcraftctl build
-      # Use npm to install production dependencies for Node-RED
-      npm install --production
-      # Install NATS CLI globally within the snap
-      npm install -g nats-cli
-    stage-packages:
-      - nodejs
-
-apps:
+  node: # We dump in a specific version of node/npm from upstream.
+    plugin: dump
+    source:
+      - on amd64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.gz
+      - on armhf: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-armv7l.tar.gz
+      - on arm64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz
+      - on s390x: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-s390x.tar.gz
+      - on ppc64el: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-ppc64le.tar.gz
   node-red:
-    command: bin/node-red-pi --userDir $SNAP_USER_DATA
-    plugs:
-      - network
-      - network-bind
-  nats-cli:
-    command: npx nats
-    plugs:
-      - network
-      - network-bind
+    after: [node]
+    plugin: nil # We use the nil plugin so we can fully override the build with whatever we need to do
+    source: .
+    stage-packages:
+      - python3
+      - libatomic1
+    override-build: | # Whatever steps needed to install node-red into the install folder, which gets incorporated into the snap
+      PATH=$PATH:../npm/bin
+      apt-get install libatomic1
+      # npm config set unsafe-perm true
+      # npm install --prefix $SNAPCRAFT_PART_INSTALL/lib
+      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport
+      find $SNAPCRAFT_PART_INSTALL -type f -name '*.js.swp' -delete
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name test -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name doc -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name example -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name sample -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname benchmark* -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname .nyc_output -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname unpacked -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name man* -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name tst -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname demo -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -name bench.gnu -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -name .npmignore -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -name .travis.yml -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -name .jshintrc -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname README.md -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname HISTORY.md -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname CONTRIBUTING.md -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname CHANGE*.md -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitmodules -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitattributes -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitignore -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname "*~" -exec rm -f {} \;
+      VER=$(npm show node-red version)
+      echo "VERSION $(npm show node-red version)"
+      snapcraftctl set-version $VER
+  settings:
+    plugin: dump
+    source: snap/local/settings # snapcraft now prefers local parts to be in snap/local
+    organize:
+      start.sh: "bin/startNR"
+      desktop-launch: "bin/desktop-launch"
