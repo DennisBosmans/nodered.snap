@@ -53,14 +53,15 @@ parts:
     stage-packages:
       - python3
       - libatomic1
-    override-build: |
+  override-build: |
       PATH=$PATH:../node/bin
       apt-get update && apt-get install -y libatomic1
-      npm config set unsafe-perm true
-      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport nats-cli
+      #   Apply `--unsafe-perm=true` directly to npm install commands
+      npm install --unsafe-perm=true --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport nats-cli
       VER=$(npm show node-red version)
       echo "Node-RED version: $VER"
       craftctl set version=$VER
+
 
   settings:
     plugin: dump
