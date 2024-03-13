@@ -1,5 +1,5 @@
 name: noderednatscli
-base: core22 # Use 'core20' as the base for recent package versions and compatibility.
+base: core20
 version: '0.1'
 summary: Node-RED with the latest Node.js and nats-cli
 description: |
@@ -7,8 +7,7 @@ description: |
 grade: stable
 confinement: strict
 architectures:
-  - build-on: arm64
-    run-on: arm64
+  - arm64
 
 apps:
   node-red:
@@ -23,8 +22,8 @@ parts:
     source: .
     override-build: |
       # Download and install Node.js (Replace 'v14.17.0' with the version you prefer)
-      wget https://nodejs.org/dist/v18.6.0/node-v18.6.0-linux-arm64.tar.xz
-      tar -xJf node-v18.6.0-linux-arm64.tar.xz -C $SNAPCRAFT_PART_INSTALL --strip-components=1
+      wget https://nodejs.org/dist/v14.17.0/node-v14.17.0-linux-arm64.tar.xz
+      tar -xJf node-v14.17.0-linux-arm64.tar.xz -C $SNAPCRAFT_PART_INSTALL --strip-components=1
       
       # Set PATH to use local node and npm binaries
       export PATH=$SNAPCRAFT_PART_INSTALL/bin:$PATH
