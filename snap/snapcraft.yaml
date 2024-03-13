@@ -1,5 +1,4 @@
 name: noderednatscli
-name: my-node-red-nats-cli
 base: core22 # Use 'core20' as the base for recent package versions and compatibility.
 version: '0.1'
 summary: Node-RED with the latest Node.js and nats-cli
