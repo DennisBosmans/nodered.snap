@@ -8,7 +8,7 @@ confinement: strict
 grade: stable
 base: core22
 
-# Limit architectures as ppcel64 doesn't build currently
+# Specify architectures
 architectures:
   - build-on: armhf
   - build-on: arm64
@@ -42,11 +42,9 @@ apps:
       - desktop
 
 parts:
-  node: # Dump in a specific version of node/npm from upstream
+  node: # Use an example source; adjust manually for your target architecture
     plugin: dump
-    source:
-      on armhf: "https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-armv7l.tar.gz"
-      on arm64: "https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz"
+    source: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz  # Example for arm64
 
   node-red:
     after: [node]
@@ -56,20 +54,10 @@ parts:
       - python3
       - libatomic1
     override-build: |
-      # Adding path to Node.js binary for ease of package installation
       PATH=$PATH:../node/bin
       apt-get update && apt-get install -y libatomic1
-      
-      # Setting npm to allow installation of packages as root
       npm config set unsafe-perm true
-      
-      # Installing node-red and required nodes
-      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport
-      
-      # Installing nats-cli via npm
-      npm install --prefix $SNAPCRAFT_PART_INSTALL/lib nats-cli
-      
-      # Capturing the version of Node-RED for reporting
+      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport nats-cli
       VER=$(npm show node-red version)
       echo "Node-RED version: $VER"
       craftctl set version=$VER
