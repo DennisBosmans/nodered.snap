@@ -1,3 +1,39 @@
+name: noderednatscli
+adopt-info: noderednatscli
+summary: Low-code programming for event-driven applications
+description: Node-RED is a flow based programming application for wiring together hardware devices, APIs and online services in new and interesting ways. For more information see http://nodered.org
+confinement: strict
+grade: stable
+base: core22
+
+# Limit architectures as ppcel64 doesn't build currently
+architectures:
+  - build-on: amd64
+  - build-on: armhf
+  - build-on: arm64
+  - build-on: s390x
+  - build-on: ppc64el
+
+apps:
+  node-red:
+    command: bin/startNR
+    daemon: simple
+    restart-condition: on-failure
+    plugs:
+      - audio-playback
+      - bluez
+      - bluetooth-control
+      - camera
+      - gpio
+      - home
+      - network-bind
+      - network
+      - network-observe
+      - pulseaudio
+      - removable-media
+      - serial-port
+  npm:
+    command: bin/npm
 
     plugs:
       - home
