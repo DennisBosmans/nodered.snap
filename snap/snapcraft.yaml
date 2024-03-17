@@ -1,6 +1,6 @@
 name: noderednatscli
 base: core22
-version: '0.2'
+version: '0.3'
 summary: Node-RED with the latest Node.js and nats-cli
 description: |
   This snap includes Node-RED, the latest version of Node.js, and nats-cli, specifically designed for ARM64 architecture.
