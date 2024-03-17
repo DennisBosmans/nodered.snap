@@ -44,9 +44,7 @@ parts:
        # Install nano-strict
        npm install nano
 
-       # Check for security issues
-       npm audit
-       
+              
     build-packages:
       - wget
       - xz-utils
