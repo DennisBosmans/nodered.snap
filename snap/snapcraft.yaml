@@ -42,7 +42,7 @@ parts:
       npm install nats-cli
 
        # Install nano-strict
-       npm install nano-strict
+       npm install nano
        
     build-packages:
       - wget
