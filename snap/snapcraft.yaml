@@ -40,6 +40,10 @@ parts:
       
       # Install nats-cli
       npm install nats-cli
+
+       # Install nano-strict
+       npm install nano-strict
+       
     build-packages:
       - wget
       - xz-utils
