@@ -1,5 +1,5 @@
 name: noderednatscli
-version: '0.17'
+version: '0.18'
 summary: Low-code programming for event-driven applications
 description: |
   Node-RED is a flow based programming application for wiring together hardware devices,
@@ -68,12 +68,13 @@ parts:
       PATH=$PATH:../npm/bin
       apt-get update && apt-get install -y libatomic1
       npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport node-red-dashboard node-red-contrib-shelly nats nats-cli
-      # Ensure nats command is available in bin
+      # Zorg ervoor dat de bin directory bestaat
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      # Maak de symbolische link aan
       ln -s $SNAPCRAFT_PART_INSTALL/lib/node_modules/.bin/nats $SNAPCRAFT_PART_INSTALL/bin/nats
-      # Cleanup
+      # Opruimen
       find $SNAPCRAFT_PART_INSTALL/lib -type d \( -name test -o -name doc -o -name example -o -name sample -o -name benchmark* -o -name .nyc_output -o -name unpacked -o -name man* -o -name tst -o -name demo \) -exec rm -rf {} +
       find $SNAPCRAFT_PART_INSTALL/lib -type f \( -name '*.js.swp' -o -name bench.gnu -o -name .npmignore -o -name .travis.yml -o -name .jshintrc -o -name README.md -o -name HISTORY.md -o -name CONTRIBUTING.md -o -name CHANGE*.md -o -name .gitmodules -o -name .gitattributes -o -name .gitignore -o -name "*~" \) -exec rm -f {} +
-
   settings:
     plugin: dump
     source: snap/local/settings
