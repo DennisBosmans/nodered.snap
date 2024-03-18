@@ -1,6 +1,6 @@
 name: noderednatscli
 adopt-info: noderednatscli
-version: '0.7'
+version: '0.8'
 summary: Low-code programming for event-driven applications
 description: Node-RED is a flow based programming application for wiring together hardware devices, APIs and online services in new and interesting ways. For more information see http://nodered.org
 confinement: strict
@@ -87,6 +87,9 @@ parts:
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitignore -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname "*~" -exec rm -f {} \;
       npm install nats-cli
+      npm install node-red-dashboard
+      npm install node-red-contrib-shelly
+      
      
   settings:
     plugin: dump
