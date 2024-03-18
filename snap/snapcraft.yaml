@@ -45,6 +45,9 @@ apps:
     command: bin/desktop-launch
     plugs:
       - desktop
+      
+  nats-cli: 
+    command: bin/nats-cli
     
       
 
