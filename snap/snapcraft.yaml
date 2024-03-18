@@ -87,8 +87,8 @@ parts:
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitignore -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname "*~" -exec rm -f {} \;
       npm install nats-cli
-      npm install node-red-dashboard
-      npm install node-red-contrib-shelly
+      npm install --prefix $SNAPCRAFT_PART_INSTALL/lib/node_modules node-red-dashboard
+      npm install --prefix $SNAPCRAFT_PART_INSTALL/lib/node_modules node-red-contrib-shelly
       
      
   settings:
