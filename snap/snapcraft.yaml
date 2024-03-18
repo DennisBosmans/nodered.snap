@@ -1,12 +1,11 @@
-name: node-red
-adopt-info: node-red
+name: noderednatscli
+adopt-info: noderednatscli
 summary: Low-code programming for event-driven applications
 description: Node-RED is a flow based programming application for wiring together hardware devices, APIs and online services in new and interesting ways. For more information see http://nodered.org
 confinement: strict
 grade: stable
 base: core22
 
-# Limit architectures as ppcel64 doesn't build currently
 architectures:
   - build-on: amd64
   - build-on: armhf
@@ -19,7 +18,7 @@ apps:
     command: bin/startNR
     daemon: simple
     restart-condition: on-failure
-        plugs:
+    plugs:
       - audio-playback
       - bluez
       - bluetooth-control
@@ -41,6 +40,7 @@ apps:
     command: bin/desktop-launch
     plugs:
       - desktop
+
 parts:
   node: # We dump in a specific version of node/npm from upstream.
     plugin: dump
@@ -57,7 +57,7 @@ parts:
     stage-packages:
       - python3
       - libatomic1
-     override-build: | # Whatever steps needed to install node-red into the install folder, which gets incorporated into the snap
+    override-build: | # Whatever steps needed to install node-red into the install folder, which gets incorporated into the snap
       PATH=$PATH:../npm/bin
       apt-get install libatomic1
       # npm config set unsafe-perm true
@@ -70,7 +70,7 @@ parts:
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name sample -prune -exec rm -rf {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname benchmark* -prune -exec rm -rf {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname .nyc_output -prune -exec rm -rf {} \;
-       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname unpacked -prune -exec rm -rf {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname unpacked -prune -exec rm -rf {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name man* -prune -exec rm -rf {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name tst -prune -exec rm -rf {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -iname demo -prune -exec rm -rf {} \;
@@ -79,7 +79,7 @@ parts:
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -name .travis.yml -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -name .jshintrc -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname README.md -exec rm -f {} \;
-       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname HISTORY.md -exec rm -f {} \;
+      find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname HISTORY.md -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname CONTRIBUTING.md -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname CHANGE*.md -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitmodules -exec rm -f {} \;
@@ -95,8 +95,3 @@ parts:
     organize:
       start.sh: "bin/startNR"
       desktop-launch: "bin/desktop-launch"
-
-
-
-
-
