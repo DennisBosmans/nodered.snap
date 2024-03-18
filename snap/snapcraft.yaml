@@ -1,0 +1,82 @@
+name: noderednatscli
+version: '0.17'
+summary: Low-code programming for event-driven applications
+description: |
+  Node-RED is a flow based programming application for wiring together hardware devices,
+  APIs and online services in new and interesting ways. For more information see http://nodered.org
+confinement: strict
+grade: stable
+base: core22
+
+architectures:
+  - build-on: amd64
+  - build-on: armhf
+  - build-on: arm64
+
+apps:
+  node-red:
+    command: bin/startNR
+    daemon: simple
+    restart-condition: on-failure
+    plugs:
+      - audio-playback
+      - bluez
+      - bluetooth-control
+      - camera
+      - gpio
+      - home
+      - network-bind
+      - network
+      - network-observe
+      - pulseaudio
+      - removable-media
+      - serial-port
+
+  npm:
+    command: bin/npm
+    plugs:
+      - home
+      - network
+
+  desktop-launch:
+    command: bin/desktop-launch
+    plugs:
+      - desktop
+
+  nats:
+    command: bin/nats
+    plugs:
+      - home
+      - network
+
+parts:
+  node:
+    plugin: dump
+    source: 
+      - on amd64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.gz
+      - on armhf: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-armv7l.tar.gz
+      - on arm64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz
+
+  node-red:
+    after: [node]
+    plugin: nil
+    source: .
+    stage-packages:
+      - python3
+      - libatomic1
+    override-build: |
+      PATH=$PATH:../npm/bin
+      apt-get update && apt-get install -y libatomic1
+      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport node-red-dashboard node-red-contrib-shelly nats nats-cli
+      # Ensure nats command is available in bin
+      ln -s $SNAPCRAFT_PART_INSTALL/lib/node_modules/.bin/nats $SNAPCRAFT_PART_INSTALL/bin/nats
+      # Cleanup
+      find $SNAPCRAFT_PART_INSTALL/lib -type d \( -name test -o -name doc -o -name example -o -name sample -o -name benchmark* -o -name .nyc_output -o -name unpacked -o -name man* -o -name tst -o -name demo \) -exec rm -rf {} +
+      find $SNAPCRAFT_PART_INSTALL/lib -type f \( -name '*.js.swp' -o -name bench.gnu -o -name .npmignore -o -name .travis.yml -o -name .jshintrc -o -name README.md -o -name HISTORY.md -o -name CONTRIBUTING.md -o -name CHANGE*.md -o -name .gitmodules -o -name .gitattributes -o -name .gitignore -o -name "*~" \) -exec rm -f {} +
+
+  settings:
+    plugin: dump
+    source: snap/local/settings
+    organize:
+      start.sh: bin/startNR
+      desktop-launch: bin/desktop-launch
