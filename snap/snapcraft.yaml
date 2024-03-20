@@ -1,6 +1,6 @@
 name: noderednatscli
 adopt-info: noderednatscli
-version: '0.16'
+version: '0.17'
 summary: Low-code programming for event-driven applications
 description: Node-RED is a flow based programming application for wiring together hardware devices, APIs and online services in new and interesting ways. For more information see http://nodered.org
 confinement: strict
@@ -20,16 +20,13 @@ apps:
     daemon: simple
     restart-condition: on-failure
     plugs:
-      - audio-playback
       - bluez
       - bluetooth-control
-      - camera
       - gpio
       - home
       - network-bind
       - network
       - network-observe
-      - pulseaudio
       - removable-media
       - serial-port
       
