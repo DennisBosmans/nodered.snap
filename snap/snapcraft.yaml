@@ -1,6 +1,6 @@
 name: noderednatscli
 adopt-info: noderednatscli
-version: '0.17'
+version: '0.18'
 summary: Low-code programming for event-driven applications
 description: Node-RED is a flow based programming application for wiring together hardware devices, APIs and online services in new and interesting ways. For more information see http://nodered.org
 confinement: strict
@@ -12,7 +12,6 @@ architectures:
   - build-on: armhf
   - build-on: arm64
   
-  
 
 apps:
   node-red:
@@ -20,33 +19,27 @@ apps:
     daemon: simple
     restart-condition: on-failure
     plugs:
+      - audio-playback
       - bluez
       - bluetooth-control
+      - camera
       - gpio
       - home
       - network-bind
       - network
       - network-observe
+      - pulseaudio
       - removable-media
       - serial-port
-      
-      
   npm:
     command: bin/npm
     plugs:
       - home
       - network
-      
-      
   desktop-launch:
     command: bin/desktop-launch
     plugs:
       - desktop
-      
-  nats-cli: 
-    command: bin/nats-cli
-    
-      
 
 parts:
   node: # We dump in a specific version of node/npm from upstream.
@@ -55,7 +48,7 @@ parts:
       - on amd64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.gz
       - on armhf: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-armv7l.tar.gz
       - on arm64: https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-arm64.tar.gz
-     
+
   node-red:
     after: [node]
     plugin: nil # We use the nil plugin so we can fully override the build with whatever we need to do
@@ -68,7 +61,7 @@ parts:
       apt-get install libatomic1
       # npm config set unsafe-perm true
       # npm install --prefix $SNAPCRAFT_PART_INSTALL/lib
-      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport node-red-dashboard node-red-contrib-shelly nats nats-cli
+      npm install --no-audit --no-fund --prefix $SNAPCRAFT_PART_INSTALL/lib node-red node-red-node-ping node-red-node-random node-red-node-serialport
       find $SNAPCRAFT_PART_INSTALL -type f -name '*.js.swp' -delete
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name test -prune -exec rm -rf {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type d -name doc -prune -exec rm -rf {} \;
@@ -92,9 +85,7 @@ parts:
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitattributes -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname .gitignore -exec rm -f {} \;
       find $SNAPCRAFT_PART_INSTALL/lib/node_modules -type f -iname "*~" -exec rm -f {} \;
-      
-      
-     
+
   settings:
     plugin: dump
     source: snap/local/settings # snapcraft now prefers local parts to be in snap/local
